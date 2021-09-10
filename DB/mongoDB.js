@@ -4,9 +4,9 @@ const connectionDB=async()=>{
     try{
         const connect=await mongoose.connect(mongoURL, { useNewUrlParser: true , useUnifiedTopology: true ,useFindAndModify:false})
         if(connect)
-        console.log("connected to DB");
+            console.log("connected to DB");
         else
-        console.log("Couldn't connect to MongoDB");
+            console.log("Couldn't connect to MongoDB");
     }
     catch(error){
         console.log(error);

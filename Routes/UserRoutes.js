@@ -1,5 +1,6 @@
 const express=require('express');
 var mongoose=require('mongoose')
+
 const { userCheckHandler } = require('../middlewares/userCheckHandler');
 const router = express.Router();
 const {User}= require('../Modals/usermodal')
@@ -8,26 +9,26 @@ const {User}= require('../Modals/usermodal')
 
 router.route('/',userCheckHandler)
     .post(async(req,res)=>{
-    try{ 
-        const {name,email,password,confirmpassword} = req.body;
-        const userCheck=await User.findOne({email:email});
-    if(password !== confirmpassword)
-        return res.status(422).json({error:"please enter same password"});
-    if(userCheck){
-        return res.status(422).json({success:false,error:"Email already registered"})
-    } 
-    const user =new User({email,name,password,confirmpassword});
-    await user.save();
-    res.status(201).json({success:true,message:"User successfully registered"});
-    }catch(err) {
-    res.send(err);
-    }
+        try{ 
+            const {name,email,password,confirmpassword} = req.body;
+            const userCheck=await User.findOne({email:email});
+        if(password !== confirmpassword)
+            return res.status(422).json({error:"please enter same password"});
+        if(userCheck){
+            return res.status(422).json({success:false,error:"Email already registered"})
+        } 
+        const user =new User({email,name,password,confirmpassword});
+        await user.save();
+        res.status(201).json({success:true,message:"User successfully registered"});
+        }catch(err) {
+            res.send(err);
+        }
 })
 
-router.post('/login',async (req, res) => {
+router.post('/login', async (req,res) => {
     try { 
         const {email,password} = req.body;
-        const user = await User.findOne({email: email, password: password}).populate("likedvideos playlists.videos")
+        const user = await User.findOne({email: email, password: password}).populate("likedvideos playlists.playlistVideos")
         if (user) {
            return res.status(200).json({success:true,user}) 
         }        
@@ -42,6 +43,7 @@ router.post('/login',async (req, res) => {
 
 router.post('/:userId/liked/:videoId',userCheckHandler,async(req,res)=>{
     try{
+
         const{userId,videoId} = req.params
         const videoLiked=await User.findById(userId).select("likedvideos");
         const videoAlreadyLiked=videoLiked.likedvideos.find((v_id)=>String(v_id)===videoId)
@@ -78,19 +80,20 @@ router.post("/:userId/playlist/:playlistName/video/:videoId",userCheckHandler,as
 
     try{
         const {userId,playlistName,videoId} = req.params
-
+        console.log(userId,playlistName,videoId)
         //get user
         const getUserPlaylists = await User.findOne({"_id":userId}).select("playlists");
         const playlistAlreadyExits = getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName === playlistName)
-
+        console.log(playlistAlreadyExits)
         if(playlistAlreadyExits) 
             {
-               const videoAlreadyExists = playlistAlreadyExits.videos.find((video)=> String(video) === String(videoId))
+                console.log("I exist")
+               const videoAlreadyExists = playlistAlreadyExits.playlistVideos.find((video)=> String(video) === String(videoId))
               
                if(videoAlreadyExists)
                 return res.status(200).json({success:true,message:"Video already exists in playlist"})
                
-                getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName===playlistName).videos = getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName===playlistName).videos.concat(String(videoId));    
+                getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName===playlistName).playlistVideos = getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName===playlistName).playlistVideos.concat(String(videoId));    
  
                const updatedPlaylist = await getUserPlaylists.save()
                 return res.status(200).json({success:true,updatedPlaylist}) 

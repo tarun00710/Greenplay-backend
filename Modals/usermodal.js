@@ -16,7 +16,7 @@ const userSchema=new mongoose.Schema({
     likedvideos:[{type:mongoose.Schema.Types.ObjectId,ref:VideoModal}],
     playlists:[{
         playlistName:{type:String,unique:true},
-        videos:[{type:mongoose.Schema.Types.ObjectId,ref:VideoModal}]
+        playlistVideos:[{type:mongoose.Schema.Types.ObjectId,ref:VideoModal}]
     }]
 })
 
