@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {VideoModal}=require('../Modals/VideoModal')
+// const {VideoModal} =  require("../Modals/VideoModal");
 const userSchema=new mongoose.Schema({
     name:{ 
         type: String,
@@ -13,13 +13,13 @@ const userSchema=new mongoose.Schema({
         type: String,
         required:true
     },
-    likedvideos:[{type:mongoose.Schema.Types.ObjectId,ref:VideoModal}],
+    likedvideos:[{type:mongoose.Schema.Types.ObjectId,ref:"VideoModal"}],
     playlists:[{
         playlistName:{type:String,unique:true},
-        playlistVideos:[{type:mongoose.Schema.Types.ObjectId,ref:VideoModal}]
+        playlistVideos:[{type:mongoose.Schema.Types.ObjectId,ref:"VideoModal"}]
     }]
 })
 
-const User= mongoose.model('USER',userSchema)
+const User= mongoose.model('User',userSchema)
 
 module.exports = {User}

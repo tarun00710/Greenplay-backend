@@ -50,6 +50,6 @@ const VideoSchema=new mongoose.Schema({
     }
 })
 
-const VideoModal=mongoose.model('videos',VideoSchema);
+const VideoModal=mongoose.model('VideoModal',VideoSchema);
 
 module.exports={VideoModal};

@@ -28,14 +28,21 @@ router.route('/',userCheckHandler)
 router.post('/login', async (req,res) => {
     try { 
         const {email,password} = req.body;
-        const user = await User.findOne({email: email, password: password}).populate("likedvideos playlists.playlistVideos")
-        if (user) {
-           return res.status(200).json({success:true,user}) 
+        let users = await User.findOne({email: email})
+        users = await users.populate("likedvideos").execPopulate()
+
+        // await users.populate("likedvideos")
+        // console.log(users)
+        // await users.populate("likedvideos").execPopulate();
+        // console.log(users)
+        //.populate("likedvideos playlists.playlistVideos")
+        if (users) {
+           return res.status(200).json({success:true,users}) 
         }        
         return res.json({success: false,message:"User doesnt exist"})
-        
+
     }catch(err) {
-        res.status(500).json({success: false,message:"Unable to login"})
+        res.status(500).json({success: false,message:err.message})
     }
 })
 
