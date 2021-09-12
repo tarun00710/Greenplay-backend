@@ -13,12 +13,14 @@ const userSchema=new mongoose.Schema({
         type: String,
         required:true
     },
-    likedvideos:[{type:mongoose.Schema.Types.ObjectId,ref:"VideoModal"}],
+    likedvideos:[{type:mongoose.Schema.Types.ObjectId,ref:"Video"}],
     playlists:[{
         playlistName:{type:String,unique:true},
-        playlistVideos:[{type:mongoose.Schema.Types.ObjectId,ref:"VideoModal"}]
+        playlistVideos:[{type:mongoose.Schema.Types.ObjectId,ref:"Video"}]
     }]
 })
+
+
 
 const User= mongoose.model('User',userSchema)
 
