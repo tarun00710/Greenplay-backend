@@ -28,8 +28,7 @@ router.route('/',userCheckHandler)
 router.post('/login', async (req,res) => {
     try { 
         const {email,password} = req.body;
-        let users = await User.findOne({email: email}).populate("likedvideos")
-        console.log(users.likedvideos)
+        let users = await User.findOne({email: email,password:password}).populate("likedvideos")
         // await users.populate("likedvideos")
         // console.log(users)
         // await users.populate("likedvideos").execPopulate();
