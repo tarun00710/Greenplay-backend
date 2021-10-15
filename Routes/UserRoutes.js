@@ -74,14 +74,15 @@ router.delete('/:userId/liked/:videoId',userCheckHandler,async(req,res)=>{
 
     return res.status(200).json({success:true,userLikedData})
 
-    }catch(error){
+    }
+    catch(error){
         return res.status(400).json({success:false, error:error})
     }
 })    
 
 //add a playlist or video to a playlist
 
-router.post("/:userId/playlist/:playlistName/video/:videoId",userCheckHandler,async(req,res) =>  {
+router.post("/:userId/playlist/:playlistName/video/:videoId", userCheckHandler, async(req,res) =>  {
 
     try{
         const {userId,playlistName,videoId} = req.params
@@ -106,7 +107,7 @@ router.post("/:userId/playlist/:playlistName/video/:videoId",userCheckHandler,as
 
         //if playlist does not exist 
         const addPlaylist =await User.findByIdAndUpdate(userId,{ 
-            "$push":{ "playlists" : [{ playlistName : playlistName,videos : [videoId]}]}
+            "$push":{ "playlists" : [{ playlistName : playlistName, playlistVideos : [videoId]}]}
         },{new:true}).select("playlists")
         return res.status(200).json({success:true,addPlaylist})
     }catch(error){
@@ -141,10 +142,10 @@ router.delete('/:userId/playlist/:playlistName/video/:videoId',userCheckHandler,
     try{
         const {userId,playlistName,videoId} = req.params
         const getUserPlaylists = await User.findOne({"_id" : userId}).select("playlists")
-
-        const playlistExists = getUserPlaylists.playlists.find((each_playlist) => String(each_playlist.playlistName)===String(playlistName))
-        playlistExists.videos=playlistExists.videos.filter((video) => String(video) !== String(videoId))
-
+        console.log(getUserPlaylists)
+        const playlistExists = getUserPlaylists.playlists.find((each_playlist) => String(each_playlist.playlistName) === String(playlistName))
+        console.log(playlistExists)
+        playlistExists.playlistVideos=playlistExists.playlistVideos.filter((video) => String(video) !== String(videoId))
         const updatedPlaylist =await getUserPlaylists.save()
 
         return res.status(200).json({success: true,updatedPlaylist})

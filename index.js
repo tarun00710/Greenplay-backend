@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const {connectionDB}=require('./DB/mongoDB')
 
 
-const PORT=process.env.PORT || 6000;
+const PORT=process.env.PORT || 5000;
 
 
 connectionDB();
