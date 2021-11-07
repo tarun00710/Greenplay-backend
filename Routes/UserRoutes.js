@@ -6,7 +6,6 @@ const router = express.Router();
 const {User}= require('../Modals/usermodal')
 
 
-
 router.route('/',userCheckHandler)
     .post(async(req,res)=>{
         try{ 
@@ -17,12 +16,13 @@ router.route('/',userCheckHandler)
         if(userCheck){
             return res.status(422).json({success:false,error:"Email already registered"})
         } 
-        const user =new User({email,name,password,confirmpassword});
+        const user = new User({email,name,password,confirmpassword});
+        console.log(user)
         await user.save();
-        res.status(201).json({success:true,message:"User successfully registered"});
+        res.status(201).json({ success:true , message:"User successfully registered"});
         }catch(err) {
-            res.send(err);
-        }
+            res.send(err.message);
+      }
 })
 
 router.post('/login', async (req,res) => {
@@ -30,9 +30,9 @@ router.post('/login', async (req,res) => {
         const {email,password} = req.body;
         let users = await User.findOne({email: email,password:password}).populate("likedvideos playlists.playlistVideos")
         if (users) {
-           return res.status(200).json({success:true,users}) 
+           return res.status(200).json({success:true ,users}) 
         }        
-        return res.json({success: false,message:"User doesnt exist"})
+        return res.status(400).json({success: false,message:"User doesnt exist"})
 
     }catch(err) {
         res.status(500).json({success: false,message:err.message})
@@ -49,7 +49,7 @@ router.post('/:userId/liked/:videoId',userCheckHandler,async(req,res)=>{
         const videoAlreadyLiked=videoLiked.likedvideos.find((v_id)=>String(v_id)===videoId)
         
         if(videoAlreadyLiked)
-            return res.json({success:true,message:"Video already exists"})
+            return res.status(403).json({success:true,message:"Video already exists"})
 
         const userLikedData=await User.findByIdAndUpdate(userId,{"$push":{likedvideos:videoId}},{new:true}).select("likedvideos")
         return res.json({success:true,userLikedData})
@@ -85,14 +85,13 @@ router.post("/:userId/playlist/:playlistName/video/:videoId", userCheckHandler, 
         //get user
         const getUserPlaylists = await User.findOne({"_id":userId}).select("playlists");
         const playlistAlreadyExits = getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName === playlistName)
-        console.log(playlistAlreadyExits)
         if(playlistAlreadyExits) 
             {
                 console.log("I exist")
                const videoAlreadyExists = playlistAlreadyExits.playlistVideos.find((video)=> String(video) === String(videoId))
               
                if(videoAlreadyExists)
-                return res.status(200).json({success:true,message:"Video already exists in playlist"})
+                return res.status(403).json({success:true,message:"Video already exists in playlist"})
                
                 getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName===playlistName).playlistVideos = getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName===playlistName).playlistVideos.concat(String(videoId));    
  
@@ -117,16 +116,20 @@ router.delete('/:userId/playlist/:playlistName',userCheckHandler,async(req, res)
     try{
         //delete whole playlist
         const {userId, playlistName} = req.params
-        const getUserPlaylists = await User.findByIdAndUpdate(userId,{
-            "$pull" : {
-                "playlists" : { playlistName : playlistName }
-            }
-        },{new:true}).select('playlists')
-
-        return res.status(200).json({success:true,getUserPlaylists})
-
+        // console.log(userId,playlistName)
+        // const getUserPlaylists = await User.findByIdAndUpdate(userId,{
+        //     "$pull" : {
+        //         "playlists" : { playlistName : playlistName }
+        //     }
+        // },{new:true}).select('playlists')
+        // return res.status(200).json({success:true,getUserPlaylists})
+        const getUserPlaylists = await User.findOne({"_id" : userId}).select("playlists")
+        getUserPlaylists.playlists = getUserPlaylists.playlists.filter((each_playlist) => String(each_playlist.playlistName) !== String(playlistName))
+        const getUpdatedPlaylist = await getUserPlaylists.save()
+        return res.status(200).json({success:true,getUpdatedPlaylist})
     }catch(error){
-        return res.status(400).json({success:false,message:error.message})
+        console.log(error)
+        return res.status(400).json({success:false,message:error.message})  
     }
 })
 
@@ -137,9 +140,7 @@ router.delete('/:userId/playlist/:playlistName/video/:videoId',userCheckHandler,
     try{
         const {userId,playlistName,videoId} = req.params
         const getUserPlaylists = await User.findOne({"_id" : userId}).select("playlists")
-        console.log(getUserPlaylists)
         const playlistExists = getUserPlaylists.playlists.find((each_playlist) => String(each_playlist.playlistName) === String(playlistName))
-        console.log(playlistExists)
         playlistExists.playlistVideos=playlistExists.playlistVideos.filter((video) => String(video) !== String(videoId))
         const updatedPlaylist =await getUserPlaylists.save()
 
