@@ -32,7 +32,7 @@ router.post('/login', async (req,res) => {
         if (users) {
            return res.status(200).json({success:true ,users}) 
         }        
-        return res.status(400).json({success: false,message:"User doesnt exist"})
+        return res.status(422).json({success: false,message:"User doesnt exist"})
 
     }catch(err) {
         res.status(500).json({success: false,message:err.message})
