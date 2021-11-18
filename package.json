@@ -2,7 +2,7 @@
   "name": "greenplay-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "node index.js",
+  "main":"node index.js",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
@@ -13,8 +13,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "test":"echo \"Error: no test specified\" && exit 1",
+    "start":"node index.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,7 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tarun00710/Greenplay-backend/issues"
+    "url":"https://github.com/tarun00710/Greenplay-backend/issues"
   },
-  "homepage": "https://github.com/tarun00710/Greenplay-backend#readme"
+  "homepage":"https://github.com/tarun00710/Greenplay-backend#readme"
 }
