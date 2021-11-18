@@ -13,4 +13,4 @@ const authVerify=(req, res, next)=> {
       return res.status(401).json({ message: "Unauthorised access, please add the token"})
     }
   }
-module.exports={authVerify}
+module.exports={authVerify};
