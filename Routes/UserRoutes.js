@@ -1,9 +1,14 @@
 const express=require('express');
+const jwt = require('jsonwebtoken');
 var mongoose=require('mongoose')
-
 const { userCheckHandler } = require('../middlewares/userCheckHandler');
 const router = express.Router();
 const {User}= require('../Modals/usermodal')
+const {authVerify} = require('../middlewares/authVerify');
+
+
+const secret = "efuhpBjqkzx2zE84IoqSVwzNakAL0McwYDMrkxVfkAyoyt0Cf9rjDwVFvwwmCYWh55ciD7HYPU5EC4cYxWMDhrZ5cnLBMgJrFBDHLzAW3ReYrQsLUd2qr6picKFl5oHxybeJU8RJRSKm8qY9ZC5NXNCZGOVSS8qAju2kQLwA9haBEWgD17QZOxbU/WY1qVM1xUfYzBIzs76oEq7x4gku6PLsnAW9oMfml0wPB2aQKIxWZjso5iWvDswLiorDnfv9hUMgjcZ5Dm4V1ciMkfu+zMrfNyRkdQZHao/aW0Zkz2hvaueAhx+n/lFZuMi0yhyOlXmHom8W3H4YhPlUztyyIw=="
+
 
 
 router.route('/',userCheckHandler)
@@ -17,8 +22,7 @@ router.route('/',userCheckHandler)
             return res.status(422).json({success:false,error:"Email already registered"})
         } 
         const user = new User({email,name,password,confirmpassword});
-        console.log(user)
-        await user.save();
+        const userSaved = await user.save();
         res.status(201).json({ success:true , message:"User successfully registered"});
         }catch(err) {
             res.send(err.message);
@@ -30,7 +34,10 @@ router.post('/login', async (req,res) => {
         const {email,password} = req.body;
         let users = await User.findOne({email: email,password:password}).populate("likedvideos playlists.playlistVideos")
         if (users) {
-           return res.status(200).json({success:true ,users}) 
+            
+            let token = jwt.sign({userData:users},secret,{expiresIn:'24h'})
+            const decoded = jwt.verify(token,secret)
+           return res.status(200).json({success:true,decoded,token}) 
         }        
         return res.status(422).json({success: false,message:"User doesnt exist"})
 
@@ -38,6 +45,21 @@ router.post('/login', async (req,res) => {
         res.status(500).json({success: false,message:err.message})
     }
 })
+
+//finding user using token
+router.get("/userInfo",authVerify,async(req,res)=>{
+    try{
+          const {userID }= req.user 
+          const getUser  = await User.findById(userID).populate("likedvideos playlists.playlistVideos")
+          res.status(200).json({success:true,getUser})
+    }catch(err) {
+        console.log(err.message)
+    }
+})
+
+
+
+
 
 //Liked video routes
 
@@ -81,13 +103,10 @@ router.post("/:userId/playlist/:playlistName/video/:videoId", userCheckHandler, 
 
     try{
         const {userId,playlistName,videoId} = req.params
-        console.log(userId,playlistName,videoId)
-        //get user
         const getUserPlaylists = await User.findOne({"_id":userId}).select("playlists");
         const playlistAlreadyExits = getUserPlaylists.playlists.find((each_playlist) => each_playlist.playlistName === playlistName)
         if(playlistAlreadyExits) 
             {
-                console.log("I exist")
                const videoAlreadyExists = playlistAlreadyExits.playlistVideos.find((video)=> String(video) === String(videoId))
               
                if(videoAlreadyExists)

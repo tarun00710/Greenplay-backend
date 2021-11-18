@@ -3,12 +3,13 @@ const cors=require('cors')
 const app=express();
 const bodyParser = require('body-parser')
 const {connectionDB}=require('./DB/mongoDB')
-
+const jwt = require('jsonwebtoken')
 
 const PORT=process.env.PORT || 5000;
 
 
 connectionDB();
+
 app.use(cors());
 app.use(bodyParser.json());
  
