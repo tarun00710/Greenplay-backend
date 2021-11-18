@@ -5,6 +5,7 @@ const { userCheckHandler } = require('../middlewares/userCheckHandler');
 const router = express.Router();
 const {User}= require('../Modals/usermodal')
 const {authVerify} = require('../middlewares/authVerify');
+const bcrypt = require('bcryptjs')
 
 
 const secret = "efuhpBjqkzx2zE84IoqSVwzNakAL0McwYDMrkxVfkAyoyt0Cf9rjDwVFvwwmCYWh55ciD7HYPU5EC4cYxWMDhrZ5cnLBMgJrFBDHLzAW3ReYrQsLUd2qr6picKFl5oHxybeJU8RJRSKm8qY9ZC5NXNCZGOVSS8qAju2kQLwA9haBEWgD17QZOxbU/WY1qVM1xUfYzBIzs76oEq7x4gku6PLsnAW9oMfml0wPB2aQKIxWZjso5iWvDswLiorDnfv9hUMgjcZ5Dm4V1ciMkfu+zMrfNyRkdQZHao/aW0Zkz2hvaueAhx+n/lFZuMi0yhyOlXmHom8W3H4YhPlUztyyIw=="
@@ -31,10 +32,10 @@ router.route('/',userCheckHandler)
 
 router.post('/login', async (req,res) => {
     try { 
-        const {email,password} = req.body;
-        let users = await User.findOne({email: email,password:password}).populate("likedvideos playlists.playlistVideos")
-        if (users) {
-            
+        const {email,password} = req.body; 
+        let users = await User.findOne({email: email}).populate("likedvideos playlists.playlistVideos")
+        const isMatch = bcrypt.compare(password,users.password)
+        if (isMatch) {
             let token = jwt.sign({userData:users},secret,{expiresIn:'24h'})
             const decoded = jwt.verify(token,secret)
            return res.status(200).json({success:true,decoded,token}) 
