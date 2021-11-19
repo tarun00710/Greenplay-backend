@@ -1,7 +1,7 @@
 const express =require('express');
 const cors=require('cors')
 const app=express();
-const bodyParser = require('body-parser')
+// const bodyParser = require('body-parser')
 const {connectionDB}=require('./DB/mongoDB')
 
 const PORT=process.env.PORT || 5000;
