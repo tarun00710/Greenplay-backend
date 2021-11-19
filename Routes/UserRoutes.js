@@ -4,7 +4,7 @@ var mongoose=require('mongoose')
 const { userCheckHandler } = require('../middlewares/userCheckHandler');
 const router = express.Router();
 const {User}= require('../Modals/usermodal')
-const {authVerify} = require('../middlewares/authVerify');
+const {authVerify} = require('../middlewares/authverify');
 const bcrypt = require('bcryptjs');
 
 
