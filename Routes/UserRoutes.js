@@ -32,6 +32,7 @@ router.route('/',userCheckHandler)
 
 router.post('/login', async (req,res) => {
     try { 
+        console.log(req)
         const {email,password} = req.body; 
         let users = await User.findOne({email: email}).populate("likedvideos playlists.playlistVideos")
         const isMatch = bcrypt.compare(password,users.password)
